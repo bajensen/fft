@@ -115,7 +115,7 @@ void render(){
 		glDisable(GL_TEXTURE_2D);
 
 		glColor3f(1.0,1.0,1.0);
-		glBegin(GL_TRIANGLES);
+		glBegin(GL_QUADS);
 		glVertex2f(0,0);
 		glVertex2f(WW,0);
 		glVertex2f(0,WH);
