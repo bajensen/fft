@@ -11,6 +11,8 @@
 #include <pulse/simple.h>
 #include <pulse/error.h>
 
+#define GL_GLEXT_PROTOTYPES
+#include <GL/glu.h>
 
 #include "oglinit.h"
 #include "font.h"
@@ -78,56 +80,145 @@ void HSBtoColor(float h, float s, float v){
         }
 }
 
+char pingPong = 0;
+GLuint FBO0,TEX0,RBO0;
+GLuint FBO1,TEX1,RBO1;
+
 void render(){
 	int i;
 		
 	glClear(GL_COLOR_BUFFER_BIT);
 	
-	glColor3f(1.0,1.0,1.0);
-	
+	GLuint prevTex,curTex,curFbo;
+	if(pingPong){
+		prevTex=TEX0;
+		curTex=TEX1;
+		curFbo=FBO1;
+	}else{
+		prevTex=TEX1;
+		curTex=TEX0;
+		curFbo=FBO0;
+	}pingPong = !pingPong;
+
+	glBindFramebuffer(GL_FRAMEBUFFER,curFbo);
+
+		glColor3f(1,1,1);
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D,prevTex);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0,1);glVertex2f(00,00-1);
+			glTexCoord2f(1,1);glVertex2f(WW,00-1);
+			glTexCoord2f(1,0);glVertex2f(WW,WH-1);
+			glTexCoord2f(0,0);glVertex2f(00,WH-1);
+		glEnd();
+		glBindTexture(GL_TEXTURE_2D,0);
+		glDisable(GL_TEXTURE_2D);
+
+		glBegin(GL_POINTS);
+		for(i=startp;i<vw+startp;++i){
+			HSBtoColor((float)outGraph[i]/(float)WH,1,1);
+			glVertex2f(i,WH);
+		}glEnd();
+	glBindTexture(GL_TEXTURE_2D,curTex);
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,0);
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+	glColor3f(1,1,1);
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D,curTex);
 	glBegin(GL_QUADS);
-	//glBegin(GL_LINES);
-		
-		for( i = startp ; i < vw+startp ; i++ ) {
-			HSBtoColor((float)outGraph[i]/(float)WH,1.0,1.0);
-			glVertex2f(i*zoom+zoom-startp*zoom,WH);
-			glVertex2f(i*zoom-startp*zoom,WH);
-			glVertex2f(i*zoom-startp*zoom,WH-outGraph[i]);
-			glVertex2f(i*zoom+zoom-startp*zoom,WH-outGraph[i]);
-			//glVertex2f(i,WH);
-		}
-		
+		glTexCoord2f(0,0);glVertex2f(00,00);
+		glTexCoord2f(1,0);glVertex2f(WW,00);
+		glTexCoord2f(1,1);glVertex2f(WW,WH);
+		glTexCoord2f(0,1);glVertex2f(00,WH);
 	glEnd();
+	glBindTexture(GL_TEXTURE_2D,0);
+	glDisable(GL_TEXTURE_2D);
 	
-	//thresholds
-	glBegin(GL_QUADS);
-		glColor3f(0.75,0,0);
-		i=selp;
-		glVertex2f(i*zoom+zoom-startp*zoom,WH);
-		glVertex2f(i*zoom-startp*zoom,WH);
-		glVertex2f(i*zoom-startp*zoom,WH-selpt);
-		glVertex2f(i*zoom+zoom-startp*zoom,WH-selpt);
-	glEnd();
-	
-	
-	//right bar
-	glBegin(GL_QUADS);
-		HSBtoColor((float)outGraph[posx]/(float)WH,1.0,1.0);
-		glVertex2f(WW-50,WH);
-		glVertex2f(WW,WH);
-		glVertex2f(WW,WH-outGraph[posx]);
-		glVertex2f(WW-50,WH-outGraph[posx]);
-	glEnd();
-	
-	
-	glColor3f(1.0,1.0,1.0);
-	sprintf(tmpbuf,"SEL=%3d:%03d Z=%d SP=%d",selp,selpt,zoom,startp);
-	text(10,32,tmpbuf);
+//	glBegin(GL_QUADS);
+//	//glBegin(GL_LINES);
+//		for( i = startp ; i < vw+startp ; i++ ) {
+//			HSBtoColor((float)outGraph[i]/(float)WH,1.0,1.0);
+//			glVertex2f(i*zoom+zoom-startp*zoom,WH);
+//			glVertex2f(i*zoom-startp*zoom,WH);
+//			glVertex2f(i*zoom-startp*zoom,WH-outGraph[i]);
+//			glVertex2f(i*zoom+zoom-startp*zoom,WH-outGraph[i]);
+//			//glVertex2f(i,WH);
+//		}
+//		
+//	glEnd();
+//	
+//	//thresholds
+//	glBegin(GL_QUADS);
+//		glColor3f(0.75,0,0);
+//		i=selp;
+//		glVertex2f(i*zoom+zoom-startp*zoom,WH);
+//		glVertex2f(i*zoom-startp*zoom,WH);
+//		glVertex2f(i*zoom-startp*zoom,WH-selpt);
+//		glVertex2f(i*zoom+zoom-startp*zoom,WH-selpt);
+//	glEnd();
+//	
+//	
+//	//right bar
+//	glBegin(GL_QUADS);
+//		HSBtoColor((float)outGraph[posx]/(float)WH,1.0,1.0);
+//		glVertex2f(WW-50,WH);
+//		glVertex2f(WW,WH);
+//		glVertex2f(WW,WH-outGraph[posx]);
+//		glVertex2f(WW-50,WH-outGraph[posx]);
+//	glEnd();
+//	
+//	
+//	glColor3f(1.0,1.0,1.0);
+//	sprintf(tmpbuf,"SEL=%3d:%03d Z=%d SP=%d",selp,selpt,zoom,startp);
+//	text(10,32,tmpbuf);
 	
 	SDL_GL_SwapBuffers();
 }
 
 int main(int argc, char*argv[]) {
+	
+	initSDLOpenGL(WW,WH,90,"SpectroFFT");
+	initfont();
+
+	glGenTextures(1,&TEX0);
+	glBindTexture(GL_TEXTURE_2D,TEX0);
+	glTexParameterf(GL_TEXTURE_2D,GL_GENERATE_MIPMAP,GL_TRUE);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,WW,WH,0,GL_RGBA,GL_UNSIGNED_BYTE,0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	glGenFramebuffers(1,&FBO0);
+	glBindFramebuffer(GL_FRAMEBUFFER,FBO0);
+	glGenRenderbuffers(1,&RBO0);
+	glBindRenderbuffer(GL_RENDERBUFFER,RBO0);
+	glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT,WW,WH);
+	glBindRenderbuffer(GL_RENDERBUFFER,0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,TEX0,0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,RBO0);
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
+
+	glGenTextures(1,&TEX1);
+	glBindTexture(GL_TEXTURE_2D,TEX1);
+	glTexParameterf(GL_TEXTURE_2D,GL_GENERATE_MIPMAP,GL_TRUE);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,GL_CLAMP_TO_EDGE);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D,0,GL_RGBA8,WW,WH,0,GL_RGBA,GL_UNSIGNED_BYTE,0);
+	glBindTexture(GL_TEXTURE_2D,0);
+	glGenFramebuffers(1,&FBO1);
+	glBindFramebuffer(GL_FRAMEBUFFER,FBO1);
+	glGenRenderbuffers(1,&RBO1);
+	glBindRenderbuffer(GL_RENDERBUFFER,RBO1);
+	glRenderbufferStorage(GL_RENDERBUFFER,GL_DEPTH_COMPONENT,WW,WH);
+	glBindRenderbuffer(GL_RENDERBUFFER,0);
+	glFramebufferTexture2D(GL_FRAMEBUFFER,GL_COLOR_ATTACHMENT0,GL_TEXTURE_2D,TEX1,0);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER,GL_DEPTH_ATTACHMENT,GL_RENDERBUFFER,RBO1);
+	glBindFramebuffer(GL_FRAMEBUFFER,0);
 
 	int i;
 	/* The sample type to use */
@@ -163,9 +254,6 @@ int main(int argc, char*argv[]) {
 		fprintf(stderr, __FILE__": pa_simple_new() failed: %s\n", pa_strerror(error));
 		goto finish;
 	}
-	
-	initSDLOpenGL(WW,WH,90,"SpectroFFT");
-	initfont();
 	
 	while (true) {
 		short buf[BUFSIZE];
@@ -219,7 +307,7 @@ int main(int argc, char*argv[]) {
 		beatCount++;
 		beatButton++;
 		if(beatCount>=beatCurrent){
-			printf("%d ",beatCurrent);
+			// printf("%d ",beatCurrent);
 			fflush(stdout);
 			beatCount=0;
 		}
