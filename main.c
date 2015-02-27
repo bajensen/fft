@@ -113,18 +113,13 @@ void render(){
 		glEnd();
 		glBindTexture(GL_TEXTURE_2D,0);
 		glDisable(GL_TEXTURE_2D);
-
-		glColor3f(1.0,1.0,1.0);
-		glBegin(GL_TRIANGLES);
-		glVertex2f(0,0);
-		glVertex2f(WW,0);
-		glVertex2f(0,WH);
-		glEnd();
 		
-		glBegin(GL_POINTS);
+		glBegin(GL_LINES);
 		for(i=startp;i<vw+startp;++i){
-			HSBtoColor((float)outGraph[i]/(float)WH,1,1);
+			#define min(a,b)((a)<(b)?(a):(b))
+			HSBtoColor((float)outGraph[i]/(float)WH*2,1,min(1,(float)outGraph[i]/(float)WH*30));
 			glVertex2f(i,WH);
+			glVertex2f(i,0);
 		}glEnd();
 	glBindTexture(GL_TEXTURE_2D,curTex);
 	glGenerateMipmap(GL_TEXTURE_2D);
