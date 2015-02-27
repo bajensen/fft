@@ -4,7 +4,7 @@
 
 SDL_Surface *screen;
 SDL_Event event;
-int oglflags=SDL_OPENGL;//|SDL_RESIZABLE;
+int oglflags=SDL_OPENGL|SDL_RESIZABLE;
 int ww,wh,oglfov,fov;
 int elapsed;
 int tick=0;

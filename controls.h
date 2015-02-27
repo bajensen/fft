@@ -8,10 +8,8 @@ int controls(){
 			return -2; break;
 		case SDL_KEYDOWN:{
 			switch(event.key.keysym.sym){
-				case SDLK_a: selp=posx; selpt=wh-mousey; break;
 				case SDLK_p: fftpause=!fftpause; break;
 				case SDLK_r: doRender=!doRender; break;
-				case SDLK_n: beatCurrent=beatButton; beatCount=beatCurrent; beatButton=0; break;
 			}	
 		}break;
 		case SDL_KEYUP:break;
