@@ -10,6 +10,8 @@ int controls(){
 			switch(event.key.keysym.sym){
 				case SDLK_p: fftpause=!fftpause; break;
 				case SDLK_r: doRender=!doRender; break;
+				case SDLK_EQUALS: magnitude-=1000; if(magnitude<1000)magnitude=1000;break;
+				case SDLK_MINUS: magnitude+=1000;
 			}	
 		}break;
 		case SDL_KEYUP:break;
@@ -30,6 +32,8 @@ int controls(){
 					break;
 				case SDL_BUTTON_WHEELUP: zoom++; break;
 				case SDL_BUTTON_WHEELDOWN: zoom--; if(zoom<1)zoom=1; break;
+				case 7: speed++; break;
+				case 6: speed--; if(speed<1)speed=1; break;
 			}
 		}break;
 		case SDL_MOUSEBUTTONDOWN:{

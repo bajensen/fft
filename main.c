@@ -1,4 +1,4 @@
-//TO COMPILE: gcc -o main main.c -lm -lpulse -lpulse-simple -lfftw3 -lSDL -lGL -lGLU
+//TO COMPILE: gcc -o main main.c -lm -lpulse -lpulse-simple -lfftw3 -lSDL -lGL -lGLU -lGLEW
 #include <stdio.h>
 #include <unistd.h>
 #include <string.h>
@@ -43,7 +43,9 @@ int posx=0;
 
 int dragging=false;
 int draginitx,draginitpos,dragendx,dragendpos;
-int zoom=1,startp=0, vw=BINSIZE;
+int zoom=2, speed=1;
+int magnitude=10000;
+int startp=0, vw=BINSIZE;
 int color;
 int fd;
 
@@ -97,20 +99,33 @@ void render(){
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D,prevTex);
 		glBegin(GL_QUADS);
-			glTexCoord2f(0,1);glVertex2f(00,00+1);
-			glTexCoord2f(1,1);glVertex2f(WW,00+1);
-			glTexCoord2f(1,0);glVertex2f(WW,WH+1);
-			glTexCoord2f(0,0);glVertex2f(00,WH+1);
+			glTexCoord2f(0,1);glVertex2f(00,00+speed);
+			glTexCoord2f(1,1);glVertex2f(WW,00+speed);
+			glTexCoord2f(1,0);glVertex2f(WW,WH+speed);
+			glTexCoord2f(0,0);glVertex2f(00,WH+speed);
 		glEnd();
 		glBindTexture(GL_TEXTURE_2D,0);
 		glDisable(GL_TEXTURE_2D);
 		
-		glBegin(GL_POINTS);
+		/*
+		glBegin(GL_LINES);
 		for(i=startp;i<vw+startp;++i){
 			#define min(a,b)((a)<(b)?(a):(b))
 			HSBtoColor((float)outGraph[i]/2000.0,1,min(1,(float)outGraph[i]/(float)WH*30));
-			glVertex2f(i,WH);
-			glVertex2f(i,0);
+			//glVertex2f(i,WH);
+			glVertex2f((i-startp)*zoom,0);
+			glVertex2f((i-startp)*zoom+zoom,0);
+		}glEnd();
+		*/
+		glBegin(GL_QUADS);
+		for(i=startp;i<vw+startp;++i){
+			#define min(a,b)((a)<(b)?(a):(b))
+			HSBtoColor((float)outGraph[i]/2000.0,1,min(1,(float)outGraph[i]/(float)WH*30));
+			//glVertex2f(i,WH);
+			glVertex2f((i-startp)*zoom,0);
+			glVertex2f((i-startp)*zoom+zoom,0);
+			glVertex2f((i-startp)*zoom+zoom,speed);
+			glVertex2f((i-startp)*zoom,speed);
 		}glEnd();
 	glBindTexture(GL_TEXTURE_2D,curTex);
 	glGenerateMipmap(GL_TEXTURE_2D);
@@ -250,8 +265,8 @@ int main(int argc, char*argv[]) {
 	
 		for(i = 0; i<BINSIZE; i++){
 			double mag,magdb;
-			mag=sqrt(pow(ifft_result[i][0],2)+pow(ifft_result[i][1],2));
-			outGraph[i]=abs(mag/10000);///10000);///10000;
+			mag=sqrt(pow(ifft_result[i][0],2)+pow(ifft_result[i][1],2));// mag=sqrt(real^2+img^2)
+			outGraph[i]=abs(mag/magnitude);
 		}
 
 		posx=mousex/zoom+startp;
