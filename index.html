@@ -29,19 +29,30 @@
     <div class="container">
       <section id="main_content">
         <h1>
-<a id="fft" class="anchor" href="#fft" aria-hidden="true"><span class="octicon octicon-link"></span></a>fft</h1>
-
-<p>OpenGL SDL FFT</p>
-
-<p>This is a fun side project I've created that allows you to view the
-spectrum of an audio sample coming from pulseaudio.</p>
-
-<p>It uses OpenGL, SDL, and the fftw4 library</p>
-
-<p>This isn't quite anything yet.</p>
+<h1 id="opengl-sdl-fft">OpenGL SDL FFT</h1>
+<img src="images/screenshot-1.png"/>
+<h2 id="about">About</h2>
+<p>This is a fun side project that allows you to view the
+spectrum of an audio sample coming from PulseAudio.</p>
+<p>It uses OpenGL, SDL, GLEW, and the fftw3 library.</p>
+<h2 id="requirements">Requirements</h2>
+<p>The following libraries , with their listed ubuntu (x64) package, are
+required to compile this program:</p>
+<ul>
+<li>SDL 2 :: libsdl2, libsdl2-dev</li>
+<li>GLEW :: libglew1.10, libglew-dev</li>
+<li>GLU :: libglu1-mesa, libglu1-mesa-dev</li>
+<li>PulseAudio :: libpulse0, libpulse-dev</li>
+<li>FFTW3 :: libfftw3-bin, libfftw3-dev</li>
+</ul>
+<h2 id="compilation">Compilation</h2>
+<p>gcc -o main main.c -lm -lpulse -lpulse-simple -lfftw3 -lSDL -lGL -lGLU -lGLEW</p>
+<h2 id="suggestions-">Suggestions?</h2>
+<p>Since this is a side project, I may not be able to implement
+many suggestions very quickly, however, I am open to them.  Just open a new issue with your idea and I&#39;ll consider it.</p>
       </section>
     </div>
 
-    
+
   </body>
 </html>
