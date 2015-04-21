@@ -8,6 +8,10 @@ int controls(){
 			return -2; break;
 		case SDL_KEYDOWN:{
 			switch(event.key.keysym.sym){
+				case SDLK_COMMA: sel_val_thresh-=.05; break;
+				case SDLK_PERIOD: sel_val_thresh+=.05; break;
+				case SDLK_k: sel_skip-=1; break;
+				case SDLK_l: sel_skip+=1; break;
 				case SDLK_p: fftpause=!fftpause; break;
 				case SDLK_r: doRender=!doRender; break;
 				case SDLK_EQUALS: magnitude-=1000; if(magnitude<1000)magnitude=1000;break;
@@ -25,7 +29,12 @@ int controls(){
 		}break;
 		case SDL_MOUSEBUTTONUP:{
 			switch(event.button.button){
-				case SDL_BUTTON_LEFT: 
+				case SDL_BUTTON_LEFT:
+					setDetector(posx);
+					//selp=posx;
+					//selpt=wh-mousey;
+					break;
+				case SDL_BUTTON_RIGHT: 
 					dragendx=event.button.x;
 					dragendpos=startp;
 					dragging=false; 
@@ -38,10 +47,10 @@ int controls(){
 		}break;
 		case SDL_MOUSEBUTTONDOWN:{
 			switch(event.button.button){
-				case SDL_BUTTON_LEFT:
+				case SDL_BUTTON_RIGHT:
 					draginitx=event.button.x;
 					draginitpos=startp;
-					dragging=true; 
+					dragging=true;
 					break;
 			}
 		}break;

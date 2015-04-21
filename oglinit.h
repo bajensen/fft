@@ -34,6 +34,7 @@ void reshape(int w,int h,int fovt){
 	screen=SDL_SetVideoMode(ww,wh,32,oglflags);
 	glViewport(0,0,ww,wh);
 	mode2d();
+	initFBO();
 }
 
 void initSDLOpenGL(int w,int h,int fovt,const char title[]){
